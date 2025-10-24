@@ -1,5 +1,5 @@
 'use client'
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getServerSideProps } from "../api/vagonApi";
 
 
@@ -8,3 +8,12 @@ import { getServerSideProps } from "../api/vagonApi";
         queryKey: ["vagons"],
         queryFn: () => getServerSideProps(),
     });
+
+
+    export const UseVagonsQuerry = () => 
+      useInfiniteQuery({
+        queryKey: ['vagons'],
+        queryFn: getServerSideProps(),
+        getNextPageParam: (lastPage, pages) => lastPage.nextCursor})
+
+

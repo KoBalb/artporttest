@@ -5,3 +5,5 @@ interface Vagon {
     OwnerName : string
     DepartureStationName : string
 }
+
+type SortType = 'number' | 'station';

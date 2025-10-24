@@ -1,47 +1,49 @@
 'use client'
 import Card from "@/components/VagonsCard/Card";
+import { useDebounce } from "@/hooks/useDebounceHook";
 import { useVagons } from "@/hooks/vagonHooks";
-import { Button, HStack, VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Button, HStack, Input, VStack } from "@chakra-ui/react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function Home() {
-  const [wagons, setWagons] = useState<Vagon[]>([]);
+  const { data: wagons, isLoading } = useVagons();
 
-  const {data, isLoading} = useVagons();
-  
-  useEffect(() => {
-  if (!isLoading) {
-    setWagons(data);
-  }
-  }, [data]);
+  const [sortType, setSortType] = useState<SortType>('number');
+  const [seacrhTerm, setSeacrhTerm] = useState('')
+  const debouncedSearch = useDebounce(seacrhTerm)
 
-  const sortByNumber = () => {
-    const sorted = [...wagons].sort((a, b) => a.VagonNumber - b.VagonNumber);
-    setWagons(sorted);
-  };
-
-  const sortByStation = () => {
-    const sorted = [...wagons].sort((a, b) => a.DepartureStationName.localeCompare(b.DepartureStationName)
-  )
-    setWagons(sorted);
-  };
+  if (isLoading) return <h1>Loading...</h1>;
+  if (!wagons) return <h1>No data</h1>;
 
 
-  
+  const sortedWagons = [...wagons].sort((a, b) => {
+    if (sortType === 'number') {
+      return a.VagonNumber - b.VagonNumber;
+    } else {
+      return a.DepartureStationName.localeCompare(b.DepartureStationName);
+    }
+  });
+
+
   return (
-    <>
     <VStack spacing="4" align="start" padding="4">
       <HStack spacing="4">
-        <Button onClick={sortByNumber} colorScheme="blue">Сортировать по номеру</Button>
-        <Button onClick={sortByStation} colorScheme="green">Сортировать по станции</Button>
+        <Button onClick={() => setSortType('number')} colorScheme="blue">
+          Сортировать по номеру
+        </Button>
+        <Button onClick={() => setSortType('station')} colorScheme="green">
+          Сортировать по станции
+        </Button>
+        <Input type="search"
+        placeholder="Поиск"
+        onChange={e => {setSeacrhTerm(e.target.value)}}
+        ></Input>
       </HStack>
-      {
-        wagons.map(vagon => <Card
-        key={vagon.VagonNumber}
-        {...vagon}
-        />)
-      }
+
+      {sortedWagons.filter(wagon => wagon.VagonNumber.toString().includes(debouncedSearch)).map(vagon => (
+        <Card key={vagon.VagonNumber} {...vagon} />
+      ))}
     </VStack>
-    </>
   );
 }
