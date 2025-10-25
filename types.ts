@@ -4,6 +4,7 @@ interface Vagon {
     CargoName : string
     OwnerName : string
     DepartureStationName : string
+    ImageUrl?: string;
 }
 
 type SortType = 'number' | 'station';

@@ -1,5 +1,5 @@
 'use client'
-import { Query, useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {useQuery } from "@tanstack/react-query";
 import { getServerSideProps } from "../api/vagonApi";
 
 
