@@ -1,10 +1,7 @@
 import { Badge, Box, Input, Stack, Text } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
-interface WagonPhoto {
-  VagonNumber: number;
-  fileUrl: string;
-}
 
 export default function Card({
   VagonNumber,
@@ -13,6 +10,13 @@ export default function Card({
   OwnerName,
   DepartureStationName,
 }: Vagon) {
+  
+  const router = useRouter();
+
+    const handleClick = () => {
+    router.push(`/v/${VagonNumber}`);
+  };
+
   const [localImage, setLocalImage] = useState<string | null>(() => {
     const stored: WagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
     const found = stored.find(w => w.VagonNumber === VagonNumber);
@@ -33,8 +37,9 @@ export default function Card({
       const index = stored.findIndex(w => w.VagonNumber === VagonNumber);
       if (index >= 0) {
         stored[index].fileUrl = fileUrl; 
+        stored[index].addedAt = Date.now()
       } else {
-        stored.push({ VagonNumber, fileUrl });
+        stored.push({ VagonNumber, fileUrl, addedAt: Date.now()});
       }
 
       localStorage.setItem("wagons", JSON.stringify(stored));
@@ -49,6 +54,7 @@ export default function Card({
       padding="4"
       boxShadow="md"
       bg="gray.50"
+      onClick={handleClick}
       maxW="300px"
     >
       <Stack spacing="2">

@@ -3,6 +3,7 @@ import Card from "@/components/VagonsCard/Card";
 import { useDebounce } from "@/hooks/useDebounceHook";
 import { useVagons } from "@/hooks/vagonHooks";
 import { Button, Flex, HStack, Input, SimpleGrid, VStack } from "@chakra-ui/react";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
@@ -38,8 +39,15 @@ export default function Home() {
   const visibleWagons = filteredWagons.slice(0, visibleCount * 5);
 
   return (<>
+
+
     <VStack spacing="4" align="stretch" padding="4" w="100%">
       <HStack spacing="4" w="100%">
+      <Link href="/photos">
+        <Button colorScheme="teal" mr={2}>
+          Перейти в галерею
+        </Button>
+      </Link>
         <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">
           Сортировать по номеру
         </Button>
