@@ -1,32 +1,46 @@
 import { Badge, Box, Input, Stack, Text } from "@chakra-ui/react";
 import { useState } from "react";
 
+interface WagonPhoto {
+  VagonNumber: number;
+  fileUrl: string;
+}
+
 export default function Card({
-    VagonNumber,
-    VagonType,
-    CargoName,
-    OwnerName,
-    DepartureStationName,
-    ImageUrl } : Vagon) {
+  VagonNumber,
+  VagonType,
+  CargoName,
+  OwnerName,
+  DepartureStationName,
+}: Vagon) {
+  const [localImage, setLocalImage] = useState<string | null>(() => {
+    const stored: WagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
+    const found = stored.find(w => w.VagonNumber === VagonNumber);
+    return found?.fileUrl || null;
+  });
 
-    const [localImage, setLocalImage] = useState<string | null>(ImageUrl || null);
-    const [fileName, setFileName] = useState<string>("");
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const newFileName = `${VagonNumber}_${file.name.split('.').pop()}`; // например "123_jpg"
-        setFileName(newFileName);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const fileUrl = reader.result as string;
+      setLocalImage(fileUrl); 
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setLocalImage(reader.result as string);
-          console.log(`📸 Фото сохранено: ${newFileName}`);
-        };
-        reader.readAsDataURL(file);
+      const stored: WagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
+
+      const index = stored.findIndex(w => w.VagonNumber === VagonNumber);
+      if (index >= 0) {
+        stored[index].fileUrl = fileUrl; 
+      } else {
+        stored.push({ VagonNumber, fileUrl });
       }
-    };
 
+      localStorage.setItem("wagons", JSON.stringify(stored));
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <Box
@@ -39,18 +53,18 @@ export default function Card({
     >
       <Stack spacing="2">
         {localImage ? (
-          <img  src={localImage} alt="Фото вагона"/>
+          <img src={localImage} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
         ) : (
           <Text fontSize="sm" color="gray.400">Нет изображения</Text>
         )}
         <Input type="file" accept="image/*" onChange={handleImageUpload} size="sm" />
-            <Text fontSize="xl" fontWeight="bold">
-            Вагон №{VagonNumber}
-            </Text>
-            <Badge colorScheme="teal">{VagonType}</Badge>
-            <Text>Груз: {CargoName}</Text>
-            <Text>Владелец: {OwnerName}</Text>
-            <Text>Станция отправления: {DepartureStationName}</Text>
+        <Text fontSize="xl" fontWeight="bold">
+          Вагон №{VagonNumber}
+        </Text>
+        <Badge colorScheme="teal">{VagonType}</Badge>
+        <Text>Груз: {CargoName}</Text>
+        <Text>Владелец: {OwnerName}</Text>
+        <Text>Станция отправления: {DepartureStationName}</Text>
       </Stack>
     </Box>
   );
