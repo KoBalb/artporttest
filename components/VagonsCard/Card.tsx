@@ -1,6 +1,7 @@
 import { Badge, Box, Input, Stack, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import ErrorBlock from "../ui/ErrorBlock";
 
 
 export default function Card({
@@ -36,8 +37,11 @@ export default function Card({
 
       const index = stored.findIndex(w => w.VagonNumber === VagonNumber);
       if (index >= 0) {
+        try {
         stored[index].fileUrl = fileUrl; 
         stored[index].addedAt = Date.now()
+        }
+        catch (e : any) { return <ErrorBlock error={e.message || 'Произошла ошибка'} />}
       } else {
         stored.push({ VagonNumber, fileUrl, addedAt: Date.now()});
       }
@@ -54,7 +58,6 @@ export default function Card({
       padding="4"
       boxShadow="md"
       bg="gray.50"
-      onClick={handleClick}
       maxW="300px"
     >
       <Stack spacing="2">
@@ -64,7 +67,7 @@ export default function Card({
           <Text fontSize="sm" color="gray.400">Нет изображения</Text>
         )}
         <Input type="file" accept="image/*" onChange={handleImageUpload} size="sm" />
-        <Text fontSize="xl" fontWeight="bold">
+        <Text fontSize="xl" fontWeight="bold" onClick={handleClick} cursor={"pointer"}>
           Вагон №{VagonNumber}
         </Text>
         <Badge colorScheme="teal">{VagonType}</Badge>
