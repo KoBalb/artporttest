@@ -16,4 +16,4 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Есть 2 ветки (develop) одна с выполненым заданием под SSR(develop-SSR) вторая через cash и хуки
+## Есть 2 ветки (develop) одна с выполненым заданием под SSR(develop-SSR) вторая через cash и хуки(develop-cash)
