@@ -1,96 +1,69 @@
-'use client';
-import { Badge, Box, Button, Divider, Stack, Text, Image, Spinner, Flex } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import { Badge, Box, Button, Divider, Stack, Text, Image} from '@chakra-ui/react';
+import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { getVagons } from '../../../api/vagonApi';
 
-export default function VagonPage() {
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { VagonNumber } = context.params!;
+  const vagons = await getVagons() 
+  const vagon = vagons.find(vagon => String(vagon.VagonNumber) === VagonNumber) || null;
+  return { props: { vagon } };
+};
+
+export default function VagonPage({ vagon }: IVagonPageProps) {
   const router = useRouter();
   const [localImage, setLocalImage] = useState<string | null>(null);
 
-  const { VagonNumber } = router.query;
-  const VagonNumberId = Number(VagonNumber);
-
-  const allWagons: IVagon[] | undefined = useQueryClient().getQueryData(['vagons']);
-  const wagon = allWagons?.find((w) => Number(w.VagonNumber) === VagonNumberId);
-
   useEffect(() => {
+    if (!vagon) return;
     const allVagonPhoto: IVagonPhoto[] = JSON.parse(localStorage.getItem('wagons') || '[]');
-    const VagonPhoto = allVagonPhoto.find((w) => Number(w.VagonNumber) === VagonNumberId);
+    const VagonPhoto = allVagonPhoto.find(w => w.VagonNumber === vagon.VagonNumber);
     if (VagonPhoto) setLocalImage(VagonPhoto.fileUrl);
-  }, [VagonNumberId]);
+  }, [vagon]);
 
-
-  if (!router.isReady)
-    return (
-      <Flex
-        w="100vw"       
-        h="100vh"    
-        justify="center" 
-        align="center"   
-      >
-        <Spinner
-          thickness="4px"
-          speed="0.65s"
-          emptyColor="gray.200"
-          color="blue.500"
-          size="xl"
-        />
-      </Flex>
-    );
-
-  if (!wagon) return <Text p={8}>Вагон не найден</Text>;
+  if (!vagon) return <Text p={8}>Вагон не найден</Text>;
 
   return (
     <Box p={8} maxW="800px" mx="auto" bg="gray.50" borderRadius="xl" boxShadow="md">
       <Stack spacing={4}>
         <Stack direction="row" justify="space-between" align="center">
-          <Text fontSize="3xl" fontWeight="bold">
-            Вагон №{wagon.VagonNumber}
-          </Text>
-          <Badge colorScheme={wagon.IsPrivate ? 'teal' : 'gray'}>
-            {wagon.VagonType}
-          </Badge>
+          <Text fontSize="3xl" fontWeight="bold">Вагон №{vagon.VagonNumber}</Text>
+          <Badge colorScheme={vagon.IsPrivate ? 'teal' : 'gray'}>{vagon.VagonType}</Badge>
         </Stack>
 
         {localImage ? (
-          <Image src={localImage} alt={`Фото вагона ${wagon.VagonNumber}`} borderRadius="lg" />
+          <Image src={localImage} alt={`Фото вагона ${vagon.VagonNumber}`} borderRadius="lg" />
         ) : (
-          <Box
-            bg="gray.100"
-            borderRadius="lg"
-            height="250px"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
+          <Box bg="gray.100" borderRadius="lg" height="250px" display="flex" alignItems="center" justifyContent="center">
             <Text color="gray.500">Нет фото</Text>
           </Box>
         )}
 
         <Divider />
 
-        <Text><strong>Тип:</strong> {wagon.VagonType}</Text>
-        <Text><strong>Операция:</strong> {wagon.OperationKind}</Text>
-        <Text><strong>Груз:</strong> {wagon.CargoName}</Text>
-        <Text><strong>Владелец:</strong> {wagon.OwnerName}</Text>
-        <Text><strong>Отправитель:</strong> {wagon.ShipperName}</Text>
-        <Text><strong>Получатель:</strong> {wagon.ReceiverName}</Text>
-        <Text><strong>Станция отправления:</strong> {wagon.DepartureStationName}</Text>
-        <Text><strong>Страна назначения:</strong> {wagon.DestinationCountryName}</Text>
+        <Text><strong>Тип:</strong> {vagon.VagonType}</Text>
+        <Text><strong>Операция:</strong> {vagon.OperationKind}</Text>
+        <Text><strong>Груз:</strong> {vagon.CargoName}</Text>
+        <Text><strong>Владелец:</strong> {vagon.OwnerName}</Text>
+        <Text><strong>Отправитель:</strong> {vagon.ShipperName}</Text>
+        <Text><strong>Получатель:</strong> {vagon.ReceiverName}</Text>
+        <Text><strong>Станция отправления:</strong> {vagon.DepartureStationName}</Text>
+        <Text><strong>Страна назначения:</strong> {vagon.DestinationCountryName}</Text>
 
         <Divider />
 
-        <Text><strong>Вес брутто:</strong> {wagon.WeightBrutto} кг</Text>
-        <Text><strong>Вес нетто:</strong> {wagon.WeightNet} кг</Text>
-        <Text><strong>Тара:</strong> {wagon.WeghtTare} кг</Text>
-        <Text><strong>Грузовые пломбы:</strong> {wagon.CargoStamps}</Text>
+        <Text><strong>Вес брутто:</strong> {vagon.WeightBrutto} кг</Text>
+        <Text><strong>Вес нетто:</strong> {vagon.WeightNet} кг</Text>
+        <Text><strong>Тара:</strong> {vagon.WeghtTare} кг</Text>
+        <Text><strong>Грузовые пломбы:</strong> {vagon.CargoStamps}</Text>
 
         <Divider />
 
-        <Text><strong>ЖД собственность:</strong> {wagon.RailwayOwn}</Text>
-        <Text><strong>ЖД накладная:</strong> {wagon.RailbillNumber}</Text>
-        <Text><strong>Вместимость:</strong> {wagon.Capacity} т</Text>
+        <Text><strong>ЖД собственность:</strong> {vagon.RailwayOwn}</Text>
+        <Text><strong>ЖД накладная:</strong> {vagon.RailbillNumber}</Text>
+        <Text><strong>Вместимость:</strong> {vagon.Capacity} т</Text>
 
         <Divider />
 

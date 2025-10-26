@@ -50,44 +50,43 @@ export default function Home() {
   
   const visibleVagons = filteredVagons.slice(0, visibleCount * 5);
 
-  return (
-    <>
-      <VStack spacing="4" align="stretch" padding="4" w="100%">
-        <HStack spacing="4" w="100%">
-          <Link href="/photos">
-            <Button colorScheme="teal" mr={2}>
-            Перейти в галерею
-            </Button>
-          </Link>
-          <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">
-            Сортировать по номеру
+  return (<>
+    <VStack spacing="4" align="stretch" padding="4" w="100%">
+      <HStack spacing="4" w="100%">
+        <Link href="/photos">
+          <Button colorScheme="teal" mr={2}>
+          Перейти в галерею
           </Button>
-          <Button onClick={() => setSortType('station')} colorScheme="green" flex="1">
-            Сортировать по станции
+        </Link>
+        <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">
+          Сортировать по номеру
+        </Button>
+        <Button onClick={() => setSortType('station')} colorScheme="green" flex="1">
+          Сортировать по станции
+        </Button>
+        <Input
+        type="search"
+        placeholder="Поиск"
+        onChange={e => setSeacrhTerm(e.target.value)}
+        flex="2"
+        />
+      </HStack>
+
+      <SimpleGrid columns={5} spacing="4">
+        {visibleVagons.map(vagon => (
+        <Card key={vagon.VagonNumber} {...vagon} />
+        ))}
+      </SimpleGrid>
+
+
+      <HStack>
+        <Flex w="100%" justify="center">
+          <Button onClick={() => setVisibleCount(c => c + 1)}>
+            Показать ещё
           </Button>
-          <Input
-          type="search"
-          placeholder="Поиск"
-          onChange={e => setSeacrhTerm(e.target.value)}
-          flex="2"
-          />
-        </HStack>
-
-        <SimpleGrid columns={5} spacing="4">
-          {visibleVagons.map(vagon => (
-          <Card key={vagon.VagonNumber} {...vagon} />
-          ))}
-        </SimpleGrid>
-
-
-        <HStack>
-          <Flex w="100%" justify="center">
-            <Button onClick={() => setVisibleCount(c => c + 1)}>
-              Показать ещё
-            </Button>
-          </Flex>
-        </HStack>
-      </VStack>
-    </>
+        </Flex>
+      </HStack>
+    </VStack>
+  </>
   );
 }

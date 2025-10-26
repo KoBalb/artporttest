@@ -41,3 +41,8 @@ interface IErrorBlockProps {
   error: string;
   onClose?: () => void;
 }
+
+
+interface IVagonPageProps {
+  vagon: IVagon | null;
+}

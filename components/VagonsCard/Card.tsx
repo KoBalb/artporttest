@@ -16,7 +16,6 @@ DepartureStationName,
     router.push(`/v/${VagonNumber}`);
   };
 
-  
   const [error, setError] = useState<string | null>(null);
   const [localImage, setLocalImage] = useState<string | null>(() => {
     try {
@@ -29,6 +28,8 @@ DepartureStationName,
     }
   });
   
+
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
