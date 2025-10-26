@@ -2,6 +2,8 @@ import { Badge, Box, Input, Stack, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ErrorBlock from "../ui/ErrorBlock";
+import Image from "next/image";
+
 
 export default function Card({
   VagonNumber,
@@ -52,7 +54,7 @@ export default function Card({
           allVagonPhoto.push({ VagonNumber, fileUrl, addedAt: Date.now() });
         }
         localStorage.setItem("wagons", JSON.stringify(allVagonPhoto));
-      } catch (e) {
+      } catch {
         setError("Общий вес загруженных файлов превышает 10 МБ, очистите фотографии");
       }
     };
@@ -64,7 +66,7 @@ export default function Card({
       <Box borderWidth="1px" borderRadius="lg" p="4" boxShadow="md" bg="gray.50" maxW="300px">
         <Stack spacing="2">
           {mounted && localImage ? (
-            <img src={localImage} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
+            <Image src={localImage} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
           ) : (
             <Text fontSize="sm" color="gray.400">Нет изображения</Text>
           )}

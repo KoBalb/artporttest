@@ -71,8 +71,8 @@ export default function Photos() {
     </Stack>
 
     <SimpleGrid columns={5} spacing="4">
-      {sortedPhotos.map((wagon) => (
-        <PhotoCard key={wagon.VagonNumber} {...wagon} onDelete={handleDelete}/>))}
+      {sortedPhotos.map((vagon) => (
+        <PhotoCard key={vagon.VagonNumber} {...vagon} onDelete={handleDelete}/>))}
     </SimpleGrid>
   </Box>
   );

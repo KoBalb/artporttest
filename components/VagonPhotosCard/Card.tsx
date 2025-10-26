@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Input, Stack, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function PhotoCard({
   VagonNumber,
@@ -27,7 +28,7 @@ export default function PhotoCard({
       maxW="300px"
     >
       <Stack spacing="2">
-        <img src={fileUrl} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
+        <Image src={fileUrl} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
         <Text fontSize="xl" fontWeight="bold" onClick={toVagonLink} cursor="pointer" >
             Вагон №{VagonNumber}
         </Text>

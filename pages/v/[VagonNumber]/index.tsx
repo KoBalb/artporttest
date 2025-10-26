@@ -1,9 +1,9 @@
-import { Badge, Box, Button, Divider, Stack, Text, Image} from '@chakra-ui/react';
+import { Badge, Box, Button, Divider, Stack, Text} from '@chakra-ui/react';
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getVagons } from '../../../api/vagonApi';
-
+import Image from "next/image";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { VagonNumber } = context.params!;
@@ -34,7 +34,7 @@ export default function VagonPage({ vagon }: IVagonPageProps) {
         </Stack>
 
         {localImage ? (
-          <Image src={localImage} alt={`Фото вагона ${vagon.VagonNumber}`} borderRadius="lg" />
+          <Image src={localImage} alt={`Фото вагона ${vagon.VagonNumber}`}/>
         ) : (
           <Box bg="gray.100" borderRadius="lg" height="250px" display="flex" alignItems="center" justifyContent="center">
             <Text color="gray.500">Нет фото</Text>
