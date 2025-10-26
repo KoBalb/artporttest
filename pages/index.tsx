@@ -1,92 +1,70 @@
-'use client'
-import Card from "@/components/VagonsCard/Card";
-import { useDebounce } from "@/hooks/useDebounceHook";
-import { useVagons } from "@/hooks/vagonHooks";
-import { Button, Flex, HStack, Input, SimpleGrid, Spinner, VStack, Text } from "@chakra-ui/react";
-import Link from "next/link";
+import { GetServerSideProps } from "next";
 import { useState } from "react";
+import Card from "@/components/VagonsCard/Card";
+import { Input, Button, VStack, HStack, SimpleGrid, Flex, Text } from "@chakra-ui/react";
+import Link from "next/link";
+import { useDebounce } from "@/hooks/useDebounceHook";
+import { getVagons } from "@/api/vagonApi";
 
-export default function Home() {
-  const { data: Vagons, isLoading } = useVagons();
+export const getServerSideProps: GetServerSideProps = async () => {
+  try {
+  const vagons = await getVagons() 
+    return { props: { vagons } };
+  } catch{
+    return { props: { vagons: [] } };
+  }
+};
 
-  const [sortType, setSortType] = useState<SortType>('number');
-  const [seacrhTerm, setSeacrhTerm] = useState('')
-  const debouncedSearch = useDebounce(seacrhTerm)
+export default function Home({ vagons }: HomePageProps) {
+  const [sortType, setSortType] = useState<'number' | 'station'>('number');
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm);
   const [visibleCount, setVisibleCount] = useState(1);
 
-
-  if (isLoading)
-    return (
-      <Flex
-      w="100vw"       
-      h="100vh"    
-      justify="center" 
-      align="center"   
-      >
-        <Spinner
-        thickness="4px"
-        speed="0.65s"
-        emptyColor="gray.200"
-        color="blue.500"
-        size="xl"
-        />
-      </Flex>
-    );
-
-  if (!Vagons) return <Text>No data</Text>;
-
-
-  const sortedVagons = [...Vagons].sort((a, b) => {
-    if (sortType === 'number') {
-      return a.VagonNumber - b.VagonNumber;
-    } else {
-      return a.DepartureStationName.localeCompare(b.DepartureStationName);
-    }
+  const sortedVagons = [...vagons].sort((a, b) => {
+    if (sortType === 'number') return a.VagonNumber - b.VagonNumber;
+    return a.DepartureStationName.localeCompare(b.DepartureStationName);
   });
 
   const filteredVagons = sortedVagons.filter(wagon =>
     wagon.VagonNumber.toString().includes(debouncedSearch)
   );
-  
+
   const visibleVagons = filteredVagons.slice(0, visibleCount * 5);
 
-  return (<>
-    <VStack spacing="4" align="stretch" padding="4" w="100%">
+  if (!vagons.length) return <Text p={8}>Вагоны не найдены</Text>;
+
+  return (
+    <VStack spacing="4" align="stretch" p="4" w="100%">
       <HStack spacing="4" w="100%">
         <Link href="/photos">
-          <Button colorScheme="teal" mr={2}>
-          Перейти в галерею
-          </Button>
+          <Button colorScheme="teal" mr={2}>Перейти в галерею</Button>
         </Link>
-        <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">
-          Сортировать по номеру
-        </Button>
-        <Button onClick={() => setSortType('station')} colorScheme="green" flex="1">
-          Сортировать по станции
-        </Button>
+
+        <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">Сортировать по номеру</Button>
+        <Button onClick={() => setSortType('station')} colorScheme="green" flex="1">Сортировать по станции</Button>
+
         <Input
-        type="search"
-        placeholder="Поиск"
-        onChange={e => setSeacrhTerm(e.target.value)}
-        flex="2"
+          type="search"
+          placeholder="Поиск"
+          onChange={e => setSearchTerm(e.target.value)}
+          flex="2"
         />
       </HStack>
 
       <SimpleGrid columns={5} spacing="4">
         {visibleVagons.map(vagon => (
-        <Card key={vagon.VagonNumber} {...vagon} />
+          <Card key={vagon.VagonNumber} {...vagon} />
         ))}
       </SimpleGrid>
 
-
       <HStack>
         <Flex w="100%" justify="center">
-          <Button onClick={() => setVisibleCount(c => c + 1)}>
-            Показать ещё
-          </Button>
+          {visibleVagons.length < filteredVagons.length && (
+            <Button onClick={() => setVisibleCount(c => c + 1)}>Показать ещё</Button>
+          )}
         </Flex>
       </HStack>
     </VStack>
-  </>
   );
 }

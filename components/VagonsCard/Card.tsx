@@ -1,14 +1,14 @@
 import { Badge, Box, Input, Stack, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ErrorBlock from "../ui/ErrorBlock";
 
 export default function Card({
-VagonNumber,
-VagonType,
-CargoName,
-OwnerName,
-DepartureStationName,
+  VagonNumber,
+  VagonType,
+  CargoName,
+  OwnerName,
+  DepartureStationName,
 }: IVagon) {
   const router = useRouter();
 
@@ -17,19 +17,19 @@ DepartureStationName,
   };
 
   const [error, setError] = useState<string | null>(null);
-  const [localImage, setLocalImage] = useState<string | null>(() => {
+  const [localImage, setLocalImage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
     try {
       const allVagonPhoto: IVagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
       const VagonPhoto = allVagonPhoto.find(w => w.VagonNumber === VagonNumber);
-      return VagonPhoto?.fileUrl || null;
+      if (VagonPhoto) setLocalImage(VagonPhoto.fileUrl);
     } catch (e) {
       setError("Ошибка чтения localStorage");
-      return null;
     }
-  });
-  
-
-
+  }, [VagonNumber]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,7 +52,7 @@ DepartureStationName,
           allVagonPhoto.push({ VagonNumber, fileUrl, addedAt: Date.now() });
         }
         localStorage.setItem("wagons", JSON.stringify(allVagonPhoto));
-    } catch (e) {
+      } catch (e) {
         setError("Общий вес загруженных файлов превышает 10 МБ, очистите фотографии");
       }
     };
@@ -60,17 +60,10 @@ DepartureStationName,
 
   return (
     <>
-    {error && <ErrorBlock error={error} />}
-      <Box
-      borderWidth="1px"
-      borderRadius="lg"
-      padding="4"
-      boxShadow="md"
-      bg="gray.50"
-      maxW="300px"
-      >
+      {error && <ErrorBlock error={error} />}
+      <Box borderWidth="1px" borderRadius="lg" p="4" boxShadow="md" bg="gray.50" maxW="300px">
         <Stack spacing="2">
-          {localImage ? (
+          {mounted && localImage ? (
             <img src={localImage} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
           ) : (
             <Text fontSize="sm" color="gray.400">Нет изображения</Text>
@@ -87,4 +80,4 @@ DepartureStationName,
       </Box>
     </>
   );
-  }
+}

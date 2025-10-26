@@ -46,3 +46,7 @@ interface IErrorBlockProps {
 interface IVagonPageProps {
   vagon: IVagon | null;
 }
+
+interface HomePageProps {
+  vagons: IVagon[];
+}
