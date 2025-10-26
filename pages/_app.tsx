@@ -4,7 +4,6 @@ import { AppProps } from "next/app"
 import { useState } from "react"
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  // создаём один экземпляр QueryClient
   const [queryClient] = useState(() => new QueryClient())
 
   return (

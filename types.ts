@@ -1,4 +1,4 @@
-interface Vagon {
+interface IVagon {
   Date: string; 
   VagonNumber: number;
   VagonType: string;
@@ -31,8 +31,13 @@ interface Vagon {
 
 type SortType = 'number' | 'station';
 
-interface WagonPhoto {
+interface IVagonPhoto {
   VagonNumber: number;
   fileUrl: string;
   addedAt: number;
+}
+
+interface IErrorBlockProps {
+  error: string;
+  onClose?: () => void;
 }

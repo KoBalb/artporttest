@@ -4,67 +4,69 @@ import { useState } from "react";
 import ErrorBlock from "../ui/ErrorBlock";
 
 export default function Card({
-  VagonNumber,
-  VagonType,
-  CargoName,
-  OwnerName,
-  DepartureStationName,
-}: Vagon) {
-
+VagonNumber,
+VagonType,
+CargoName,
+OwnerName,
+DepartureStationName,
+}: IVagon) {
   const router = useRouter();
+
+  const toVagonLink = () => {
+    router.push(`/v/${VagonNumber}`);
+  };
+
+  
   const [error, setError] = useState<string | null>(null);
   const [localImage, setLocalImage] = useState<string | null>(() => {
     try {
-      const stored: WagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
-      const found = stored.find(w => w.VagonNumber === VagonNumber);
-      return found?.fileUrl || null;
-    } catch (e: any) {
+      const allVagonPhoto: IVagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
+      const VagonPhoto = allVagonPhoto.find(w => w.VagonNumber === VagonNumber);
+      return VagonPhoto?.fileUrl || null;
+    } catch (e) {
       setError("Ошибка чтения localStorage");
       return null;
     }
   });
-
-  const handleClick = () => {
-    router.push(`/v/${VagonNumber}`);
-  };
+  
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
+    reader.readAsDataURL(file);
+
     reader.onloadend = () => {
       const fileUrl = reader.result as string;
       setLocalImage(fileUrl);
 
       try {
-        const stored: WagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
-        const index = stored.findIndex(w => w.VagonNumber === VagonNumber);
+        const allVagonPhoto: IVagonPhoto[] = JSON.parse(localStorage.getItem("wagons") || "[]");
+        const index = allVagonPhoto.findIndex(w => w.VagonNumber === VagonNumber);
 
         if (index >= 0) {
-          stored[index].fileUrl = fileUrl;
-          stored[index].addedAt = Date.now();
+          allVagonPhoto[index].fileUrl = fileUrl;
+          allVagonPhoto[index].addedAt = Date.now();
         } else {
-          stored.push({ VagonNumber, fileUrl, addedAt: Date.now() });
+          allVagonPhoto.push({ VagonNumber, fileUrl, addedAt: Date.now() });
         }
-
-        localStorage.setItem("wagons", JSON.stringify(stored));
-      } catch (e: any) {
-        setError("Общий вес загруженных файлов превышает 10 мб, очистите фотографии");
+        localStorage.setItem("wagons", JSON.stringify(allVagonPhoto));
+    } catch (e) {
+        setError("Общий вес загруженных файлов превышает 10 МБ, очистите фотографии");
       }
-    reader.readAsDataURL(file);
+    };
   };
 
   return (
     <>
-      {error && <ErrorBlock error={error} />}
+    {error && <ErrorBlock error={error} />}
       <Box
-        borderWidth="1px"
-        borderRadius="lg"
-        padding="4"
-        boxShadow="md"
-        bg="gray.50"
-        maxW="300px"
+      borderWidth="1px"
+      borderRadius="lg"
+      padding="4"
+      boxShadow="md"
+      bg="gray.50"
+      maxW="300px"
       >
         <Stack spacing="2">
           {localImage ? (
@@ -73,7 +75,7 @@ export default function Card({
             <Text fontSize="sm" color="gray.400">Нет изображения</Text>
           )}
           <Input type="file" accept="image/*" onChange={handleImageUpload} size="sm" />
-          <Text fontSize="xl" fontWeight="bold" onClick={handleClick} cursor={"pointer"}>
+          <Text fontSize="xl" fontWeight="bold" onClick={toVagonLink} cursor="pointer">
             Вагон №{VagonNumber}
           </Text>
           <Badge colorScheme="teal">{VagonType}</Badge>
@@ -84,4 +86,4 @@ export default function Card({
       </Box>
     </>
   );
-}
+  }

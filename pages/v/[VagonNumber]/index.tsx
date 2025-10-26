@@ -1,34 +1,42 @@
 'use client';
-import { Badge, Box, Button, Divider, Stack, Text, Image, Spinner } from '@chakra-ui/react';
+import { Badge, Box, Button, Divider, Stack, Text, Image, Spinner, Flex } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export default function VagonPage() {
-  const qc = useQueryClient();
   const router = useRouter();
   const [localImage, setLocalImage] = useState<string | null>(null);
 
   const { VagonNumber } = router.query;
   const VagonNumberId = Number(VagonNumber);
 
-  const allWagons: Vagon[] | undefined = qc.getQueryData(['vagons']);
+  const allWagons: IVagon[] | undefined = useQueryClient().getQueryData(['vagons']);
   const wagon = allWagons?.find((w) => Number(w.VagonNumber) === VagonNumberId);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !VagonNumberId) return;
-    const stored: WagonPhoto[] = JSON.parse(localStorage.getItem('wagons') || '[]');
-    const found = stored.find((w) => Number(w.VagonNumber) === VagonNumberId);
-    if (found) setLocalImage(found.fileUrl);
+    const allVagonPhoto: IVagonPhoto[] = JSON.parse(localStorage.getItem('wagons') || '[]');
+    const VagonPhoto = allVagonPhoto.find((w) => Number(w.VagonNumber) === VagonNumberId);
+    if (VagonPhoto) setLocalImage(VagonPhoto.fileUrl);
   }, [VagonNumberId]);
 
 
   if (!router.isReady)
     return (
-      <Box p={8} textAlign="center">
-        <Spinner size="xl" />
-        <Text mt={4}>Загрузка...</Text>
-      </Box>
+      <Flex
+        w="100vw"       
+        h="100vh"    
+        justify="center" 
+        align="center"   
+      >
+        <Spinner
+          thickness="4px"
+          speed="0.65s"
+          emptyColor="gray.200"
+          color="blue.500"
+          size="xl"
+        />
+      </Flex>
     );
 
   if (!wagon) return <Text p={8}>Вагон не найден</Text>;
@@ -62,7 +70,6 @@ export default function VagonPage() {
 
         <Divider />
 
-        <Text><strong>Дата:</strong> {new Date(wagon.Date).toLocaleString('ru-RU')}</Text>
         <Text><strong>Тип:</strong> {wagon.VagonType}</Text>
         <Text><strong>Операция:</strong> {wagon.OperationKind}</Text>
         <Text><strong>Груз:</strong> {wagon.CargoName}</Text>

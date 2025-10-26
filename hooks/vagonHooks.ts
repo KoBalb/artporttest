@@ -4,7 +4,7 @@ import { getServerSideProps } from "../api/vagonApi";
 
 
 export const useVagons = () =>
-  useQuery<Vagon[], Error>({
+  useQuery<IVagon[], Error>({
       queryKey: ["vagons"],
       queryFn: () => getServerSideProps(),
   });

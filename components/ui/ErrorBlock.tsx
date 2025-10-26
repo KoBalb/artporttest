@@ -2,12 +2,9 @@
 import { Box, Slide, Text } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
-interface ErrorBlockProps {
-  error: string;
-  onClose?: () => void;
-}
 
-export default function ErrorBlock({ error, onClose }: ErrorBlockProps) {
+
+export default function ErrorBlock({ error, onClose }: IErrorBlockProps) {
   const [showError, setShowError] = useState(true);
 
   useEffect(() => {

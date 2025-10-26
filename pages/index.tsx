@@ -2,29 +2,41 @@
 import Card from "@/components/VagonsCard/Card";
 import { useDebounce } from "@/hooks/useDebounceHook";
 import { useVagons } from "@/hooks/vagonHooks";
-import { Button, Flex, HStack, Input, SimpleGrid, VStack } from "@chakra-ui/react";
+import { Button, Flex, HStack, Input, SimpleGrid, Spinner, VStack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
-  const { data: wagons, isLoading } = useVagons();
-
+  const { data: Vagons, isLoading } = useVagons();
 
   const [sortType, setSortType] = useState<SortType>('number');
   const [seacrhTerm, setSeacrhTerm] = useState('')
   const debouncedSearch = useDebounce(seacrhTerm)
-
-
   const [visibleCount, setVisibleCount] = useState(1);
 
-  
+
+  if (isLoading)
+    return (
+      <Flex
+      w="100vw"       
+      h="100vh"    
+      justify="center" 
+      align="center"   
+      >
+        <Spinner
+        thickness="4px"
+        speed="0.65s"
+        emptyColor="gray.200"
+        color="blue.500"
+        size="xl"
+        />
+      </Flex>
+    );
+
+  if (!Vagons) return <Text>No data</Text>;
 
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (!wagons) return <h1>No data</h1>;
-  
-
-  const sortedWagons = [...wagons].sort((a, b) => {
+  const sortedVagons = [...Vagons].sort((a, b) => {
     if (sortType === 'number') {
       return a.VagonNumber - b.VagonNumber;
     } else {
@@ -32,55 +44,50 @@ export default function Home() {
     }
   });
 
-  const filteredWagons = sortedWagons.filter(wagon =>
-  wagon.VagonNumber.toString().includes(debouncedSearch)
+  const filteredVagons = sortedVagons.filter(wagon =>
+    wagon.VagonNumber.toString().includes(debouncedSearch)
   );
+  
+  const visibleVagons = filteredVagons.slice(0, visibleCount * 5);
 
-  const visibleWagons = filteredWagons.slice(0, visibleCount * 5);
-
-  return (<>
-
-
-    <VStack spacing="4" align="stretch" padding="4" w="100%">
-      <HStack spacing="4" w="100%">
-      <Link href="/photos">
-        <Button colorScheme="teal" mr={2}>
-          Перейти в галерею
-        </Button>
-      </Link>
-        <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">
-          Сортировать по номеру
-        </Button>
-        <Button onClick={() => setSortType('station')} colorScheme="green" flex="1">
-          Сортировать по станции
-        </Button>
-        <Input
+  return (
+    <>
+      <VStack spacing="4" align="stretch" padding="4" w="100%">
+        <HStack spacing="4" w="100%">
+          <Link href="/photos">
+            <Button colorScheme="teal" mr={2}>
+            Перейти в галерею
+            </Button>
+          </Link>
+          <Button onClick={() => setSortType('number')} colorScheme="blue" flex="1">
+            Сортировать по номеру
+          </Button>
+          <Button onClick={() => setSortType('station')} colorScheme="green" flex="1">
+            Сортировать по станции
+          </Button>
+          <Input
           type="search"
           placeholder="Поиск"
           onChange={e => setSeacrhTerm(e.target.value)}
           flex="2"
-        />
-        
-      </HStack>
+          />
+        </HStack>
 
-      <SimpleGrid columns={5} spacing="4">
-          {visibleWagons.map(vagon => (
-            <Card key={vagon.VagonNumber} {...vagon} />
+        <SimpleGrid columns={5} spacing="4">
+          {visibleVagons.map(vagon => (
+          <Card key={vagon.VagonNumber} {...vagon} />
           ))}
-      </SimpleGrid>
+        </SimpleGrid>
 
 
-<HStack>
-  <Flex w="100%" justify="center">
-    <Button onClick={() => setVisibleCount(c => c + 1)}>
-      Показать ещё
-    </Button>
-  </Flex>
-
-  </HStack>
-    </VStack>
-
-
-    
-  </>);
+        <HStack>
+          <Flex w="100%" justify="center">
+            <Button onClick={() => setVisibleCount(c => c + 1)}>
+              Показать ещё
+            </Button>
+          </Flex>
+        </HStack>
+      </VStack>
+    </>
+  );
 }

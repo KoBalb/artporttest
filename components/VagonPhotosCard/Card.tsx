@@ -1,13 +1,20 @@
 import { Badge, Box, Button, Input, Stack, Text } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 export default function PhotoCard({
   VagonNumber,
   fileUrl,
   onDelete
-}: WagonPhoto & { onDelete: (vagonNumber: number) => void }) {
+}: IVagonPhoto & { onDelete: (vagonNumber: number) => void }) {
  
   const handleDelete = () => {
     onDelete(VagonNumber);
+  };
+
+  const router = useRouter();
+  
+  const toVagonLink = () => {
+    router.push(`/v/${VagonNumber}`);
   };
 
   return (
@@ -21,7 +28,7 @@ export default function PhotoCard({
     >
       <Stack spacing="2">
         <img src={fileUrl} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
-        <Text fontSize="xl" fontWeight="bold">
+        <Text fontSize="xl" fontWeight="bold" onClick={toVagonLink} cursor="pointer" >
             Вагон №{VagonNumber}
         </Text>
         <Button colorScheme="red" size="sm" onClick={handleDelete}>
