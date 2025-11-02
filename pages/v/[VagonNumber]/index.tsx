@@ -1,27 +1,66 @@
-import { Badge, Box, Button, Divider, Stack, Text} from '@chakra-ui/react';
-import { GetServerSideProps } from 'next';
-import { useEffect, useState } from 'react';
+'use client';
+import { Badge, Box, Button, Divider, Stack, Text, Image, Spinner, Flex } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { getVagons } from '../../../api/vagonApi';
-import Image from "next/image";
+import { useEffect, useState } from 'react';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { VagonNumber } = context.params!;
-  const vagons = await getVagons() 
-  const vagon = vagons.find(vagon => String(vagon.VagonNumber) === VagonNumber) || null;
-  return { props: { vagon } };
-};
-
-export default function VagonPage({ vagon }: IVagonPageProps) {
+export default function VagonPage() {
   const router = useRouter();
   const [localImage, setLocalImage] = useState<string | null>(null);
 
+  const { VagonNumber } = router.query;
+  const VagonNumberId = Number(VagonNumber);
+
+  const allWagons = useQueryClient().getQueryData<VagonsResponse>(['vagons']);
+
+  if (!allWagons) {
+    return (
+    <Flex
+      w="100vw"
+      h="100vh"
+      justify="center"
+      align="center"
+      bg="gray.50"
+      flexDirection="column"
+      textAlign="center"
+      p={4}
+    >
+      <Text fontSize="2xl" mb={4}>
+        Вагон не найден
+      </Text>
+      <Button colorScheme="blue" onClick={() => router.push('/')}>
+        Перейти на главную
+      </Button>
+    </Flex>
+  );
+  }
+
+  const vagon = allWagons.data.Vagons?.find((w) => Number(w.VagonNumber) === VagonNumberId);
+
   useEffect(() => {
-    if (!vagon) return;
     const allVagonPhoto: IVagonPhoto[] = JSON.parse(localStorage.getItem('wagons') || '[]');
-    const VagonPhoto = allVagonPhoto.find(w => w.VagonNumber === vagon.VagonNumber);
+    const VagonPhoto = allVagonPhoto.find((w) => Number(w.VagonNumber) === VagonNumberId);
     if (VagonPhoto) setLocalImage(VagonPhoto.fileUrl);
-  }, [vagon]);
+  }, [VagonNumberId]);
+
+
+  if (!router.isReady)
+    return (
+      <Flex
+        w="100vw"       
+        h="100vh"    
+        justify="center" 
+        align="center"   
+      >
+        <Spinner
+          thickness="4px"
+          speed="0.65s"
+          emptyColor="gray.200"
+          color="blue.500"
+          size="xl"
+        />
+      </Flex>
+    );
 
   if (!vagon) return <Text p={8}>Вагон не найден</Text>;
 
@@ -29,14 +68,25 @@ export default function VagonPage({ vagon }: IVagonPageProps) {
     <Box p={8} maxW="800px" mx="auto" bg="gray.50" borderRadius="xl" boxShadow="md">
       <Stack spacing={4}>
         <Stack direction="row" justify="space-between" align="center">
-          <Text fontSize="3xl" fontWeight="bold">Вагон №{vagon.VagonNumber}</Text>
-          <Badge colorScheme={vagon.IsPrivate ? 'teal' : 'gray'}>{vagon.VagonType}</Badge>
+          <Text fontSize="3xl" fontWeight="bold">
+            Вагон №{vagon.VagonNumber}
+          </Text>
+          <Badge colorScheme={vagon.IsPrivate ? 'teal' : 'gray'}>
+            {vagon.VagonType}
+          </Badge>
         </Stack>
 
         {localImage ? (
-          <Image src={localImage} alt={`Фото вагона ${vagon.VagonNumber}`}/>
+          <Image src={localImage} alt={`Фото вагона ${vagon.VagonNumber}`} borderRadius="lg" />
         ) : (
-          <Box bg="gray.100" borderRadius="lg" height="250px" display="flex" alignItems="center" justifyContent="center">
+          <Box
+            bg="gray.100"
+            borderRadius="lg"
+            height="250px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
             <Text color="gray.500">Нет фото</Text>
           </Box>
         )}

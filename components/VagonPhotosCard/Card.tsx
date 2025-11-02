@@ -28,7 +28,10 @@ export default function PhotoCard({
       maxW="300px"
     >
       <Stack spacing="2">
-        <Image src={fileUrl} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
+        <Image src={fileUrl} 
+        alt={`Фото вагона ${VagonNumber}`}
+        width={300}   
+        height={200} />
         <Text fontSize="xl" fontWeight="bold" onClick={toVagonLink} cursor="pointer" >
             Вагон №{VagonNumber}
         </Text>

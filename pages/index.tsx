@@ -1,26 +1,35 @@
-import { GetServerSideProps } from "next";
 import { useState } from "react";
 import Card from "@/components/VagonsCard/Card";
-import { Input, Button, VStack, HStack, SimpleGrid, Flex, Text } from "@chakra-ui/react";
+import { Input, Button, VStack, HStack, SimpleGrid, Flex, Text, Spinner } from "@chakra-ui/react";
 import Link from "next/link";
 import { useDebounce } from "@/hooks/useDebounceHook";
-import axios from "axios";
+import { useVagons } from "@/hooks/vagonsHooks";
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  try {
-  const res = await axios.get<IVagon[]>('http://localhost:3000/api/vagon');
-  const vagons = res.data.Vagons;
-    return { props: { vagons } };
-  } catch{
-    return { props: { vagons: [] } };
-  }
-};
 
-export default function Home({ vagons }: HomePageProps) {
+export default function Home() {
+  const { data : vagons, isLoading } = useVagons()
+
   const [sortType, setSortType] = useState<'number' | 'station'>('number');
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm);
   const [visibleCount, setVisibleCount] = useState(1);
+
+  if (isLoading) return (
+        <Flex
+          w="100vw"       
+          h="100vh"    
+          justify="center" 
+          align="center"   
+        >
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+        </Flex>
+      );
 
   const sortedVagons = [...vagons].sort((a, b) => {
     if (sortType === 'number') 

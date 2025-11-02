@@ -28,6 +28,30 @@ interface IVagon {
   RecordNumber: number;
 }
 
+  interface VagonsResponse {
+    data: {
+      Vagons: Array<{
+        VagonNumber: string | number;
+        VagonType: string;
+        IsPrivate: boolean;
+        OperationKind: string;
+        CargoName: string;
+        OwnerName: string;
+        ShipperName: string;
+        ReceiverName: string;
+        DepartureStationName: string;
+        DestinationCountryName: string;
+        WeightBrutto: number;
+        WeightNet: number;
+        WeghtTare: number;
+        CargoStamps: string;
+        RailwayOwn: string;
+        RailbillNumber: string;
+        Capacity: number;
+      }>;
+    };
+  }
+
 
 type SortType = 'number' | 'station';
 
