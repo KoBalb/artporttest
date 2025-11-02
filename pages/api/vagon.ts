@@ -4,7 +4,8 @@ import axios from "axios";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      const response = await axios.get("https://rwl.artport.pro/commercialAgent/hs/CarrWorkApp/VagonInfo"); 
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const response = await axios.get(`${baseURL}/CarrWorkApp/VagonInfo`); 
       res.status(200).json(response.data);
     } catch (error: any) {
       console.error(error);
