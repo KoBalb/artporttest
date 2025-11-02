@@ -2,8 +2,8 @@ import { useState } from "react";
 import Card from "@/components/VagonsCard/Card";
 import { Input, Button, VStack, HStack, SimpleGrid, Flex, Text, Spinner } from "@chakra-ui/react";
 import Link from "next/link";
-import { useDebounce } from "@/hooks/useDebounceHook";
-import { useVagons } from "@/hooks/vagonsHooks";
+import { useDebounce } from "@/shared/lib/hooks/useDebounceHook";
+import { useVagons } from "@/shared/lib/hooks/vagonsHooks";
 
 
 export default function Home() {
