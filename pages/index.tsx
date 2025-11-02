@@ -4,11 +4,12 @@ import Card from "@/components/VagonsCard/Card";
 import { Input, Button, VStack, HStack, SimpleGrid, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useDebounce } from "@/hooks/useDebounceHook";
-import { getVagons } from "@/api/vagonApi";
+import axios from "axios";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-  const vagons = await getVagons() 
+  const res = await axios.get<IVagon[]>('http://localhost:3000/api/vagon');
+  const vagons = res.data.Vagons;
     return { props: { vagons } };
   } catch{
     return { props: { vagons: [] } };
@@ -22,12 +23,13 @@ export default function Home({ vagons }: HomePageProps) {
   const [visibleCount, setVisibleCount] = useState(1);
 
   const sortedVagons = [...vagons].sort((a, b) => {
-    if (sortType === 'number') return a.VagonNumber - b.VagonNumber;
+    if (sortType === 'number') 
+      return a.VagonNumber - b.VagonNumber;
     return a.DepartureStationName.localeCompare(b.DepartureStationName);
   });
 
-  const filteredVagons = sortedVagons.filter(wagon =>
-    wagon.VagonNumber.toString().includes(debouncedSearch)
+  const filteredVagons = sortedVagons.filter(vagon =>
+    vagon.VagonNumber.toString().includes(debouncedSearch)
   );
 
   const visibleVagons = filteredVagons.slice(0, visibleCount * 5);

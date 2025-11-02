@@ -66,7 +66,11 @@ export default function Card({
       <Box borderWidth="1px" borderRadius="lg" p="4" boxShadow="md" bg="gray.50" maxW="300px">
         <Stack spacing="2">
           {mounted && localImage ? (
-            <Image src={localImage} alt={`Фото вагона ${VagonNumber}`} style={{ width: "100%" }} />
+            <Image 
+            src={localImage} 
+            alt={`Фото вагона ${VagonNumber}`} 
+            width={300}   
+            height={200} />
           ) : (
             <Text fontSize="sm" color="gray.400">Нет изображения</Text>
           )}
